@@ -10,7 +10,29 @@ using namespace std;
 void get_URL( const string& host, const string& path )
 {
   cerr << "Function called: get_URL(" << host << ", " << path << ")\n";
-  cerr << "Warning: get_URL() has not been implemented yet.\n";
+  // cerr << "Warning: get_URL() has not been implemented yet.\n";
+
+  // Address(): Construct by resolving a hostname and servicename.
+  Address serverAddr = Address( host, "http" );
+  string serverIp = serverAddr.ip();
+  // uint16_t serverPort = serverAddr.port();
+  // cout << serverIp << " " << serverPort << endl;
+  TCPSocket clientSocket;
+  clientSocket.connect( serverAddr );
+  string request = "GET " + path + " HTTP/1.1\r\n" + 
+                   "Host: " + host + "\r\n" + 
+                   "Connection: close" + "\r\n\r\n";                   
+  // cout << request << endl;
+  clientSocket.write( request );
+
+  string recvPayload;
+  while ( !clientSocket.eof() ) {
+    clientSocket.read(recvPayload);
+    cout << recvPayload;
+    recvPayload.clear();
+  }
+  clientSocket.close();
+  // cout << recvPayload << endl;
 }
 
 int main( int argc, char* argv[] )
