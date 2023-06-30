@@ -8,17 +8,19 @@ void Reassembler::preProcess( uint64_t& first_index, string& data, Writer& outpu
   uint64_t first_unassembled_index = output.bytes_pushed();
   // 直接丢弃[first_unassembled_index, first_unacceptable_index)之外的数据
   if ( first_index + data.size() <= first_unassembled_index ) {
+    data = "";
     return;
   }
   uint64_t first_unacceptable_index = first_unassembled_index + output.available_capacity();
   if ( first_index >= first_unacceptable_index ) {
+    data = "";
     return;
   }
 
   // 去尾
   if ( first_index + data.size() > first_unacceptable_index ) {
     // data = data.substr( 0, first_unacceptable_index - first_index );
-    if ( first_index >= first_unassembled_index )
+    if ( first_index < first_unassembled_index )
       data = data.substr( 0, first_unacceptable_index - first_index );
     else
       data = data.substr( first_unassembled_index, first_unacceptable_index - first_index );
@@ -37,9 +39,8 @@ void Reassembler::preProcess( uint64_t& first_index, string& data, Writer& outpu
 // 处理data与map中已有字符串的重叠问题
 bool Reassembler::process_overlapping( uint64_t& first_index, string& data )
 {
-  uint64_t len = data.size();
-
   for ( auto iter = reassembler_buffer.begin(); iter != reassembler_buffer.end(); ) {
+    uint64_t len = data.size();
     uint64_t index = iter->first;
     string str = iter->second;
     if ( first_index + len < index || index + str.size() < first_index ) {
@@ -48,7 +49,8 @@ bool Reassembler::process_overlapping( uint64_t& first_index, string& data )
     }
     // 新插入的包围原有的
     if ( first_index < index && first_index + len > index + str.size() ) {
-      reassembler_buffer.erase( index );
+      bytes_in_Reassembler -= str.size();
+      reassembler_buffer.erase( iter++ );
     }
     // 新插入的被原有的包围
     else if ( first_index >= index && first_index + len <= index + str.size() ) {
@@ -58,11 +60,13 @@ bool Reassembler::process_overlapping( uint64_t& first_index, string& data )
     // 新串屁股重叠
     else if ( first_index < index && first_index + len - 1 >= index ) {
       data = data.substr( 0, index - first_index );
+      iter++;
     }
     // 新串头部重叠
     else if ( first_index < index + str.size() && first_index + len > index + str.size() ) {
       data = data.substr( index + str.size() - first_index );
       first_index = index + str.size();
+      iter++;
     } else {
       ++iter;
     }
@@ -88,9 +92,9 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
 
   // 1. preProcess first
   preProcess( first_index, data, output );
-  // if ( data == "" )
-  //   return;
-  
+  if ( data == "" && !is_last_substring )
+    return;
+
   // 2. process the overlapping part of the new string and strings in map
   if ( process_overlapping( first_index, data ) == false )
     return;
