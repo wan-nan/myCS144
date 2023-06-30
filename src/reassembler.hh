@@ -2,10 +2,10 @@
 
 #include "byte_stream.hh"
 
-#include <map>
-#include <string>
 #include <climits>
 #include <iostream>
+#include <map>
+#include <string>
 
 using namespace std;
 class Reassembler
@@ -38,7 +38,7 @@ public:
 
 private:
   // uint64_t first_unassembled_index = 0;
-  map<uint64_t, string> reassembler_buffer{};
+  map<uint64_t, string> reassembler_buffer {};
   uint64_t bytes_in_Reassembler = 0;
   void preProcess( uint64_t& first_index, string& data, Writer& output );
   bool process_overlapping( uint64_t& first_index, string& data );
