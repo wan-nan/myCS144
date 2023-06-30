@@ -108,9 +108,9 @@ int main()
       test.execute( BytesPushed( 2 ) );
       test.execute( BytesPending( 0 ) );
       test.execute( ReadAll( "ab" ) );
-      
+
       test.execute( IsFinished { false } );
-      
+
       test.execute( Insert { "bc", 1 }.is_last() );
       test.execute( BytesPushed( 3 ) );
       test.execute( BytesPending( 0 ) );

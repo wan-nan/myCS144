@@ -89,6 +89,9 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   //   output.close();
   //   return;
   // }
+  // 0. update whole_length
+  if ( is_last_substring )
+    whole_length = first_index + data.size();
 
   // 1. preProcess first
   preProcess( first_index, data, output );
@@ -119,8 +122,8 @@ void Reassembler::insert( uint64_t first_index, string data, bool is_last_substr
   }
 
   // 5. judge whether it's the end or not
-  if ( is_last_substring )
-    whole_length = first_index + data.size();
+  // if ( is_last_substring )
+  //   whole_length = first_index + data.size();
   if ( output.bytes_pushed() == whole_length )
     output.close();
 }
