@@ -2,8 +2,12 @@
 
 #include "byte_stream.hh"
 
+#include <map>
 #include <string>
+#include <climits>
+#include <iostream>
 
+using namespace std;
 class Reassembler
 {
 public:
@@ -31,4 +35,12 @@ public:
 
   // How many bytes are stored in the Reassembler itself?
   uint64_t bytes_pending() const;
+
+private:
+  // uint64_t first_unassembled_index = 0;
+  map<uint64_t, string> reassembler_buffer{};
+  uint64_t bytes_in_Reassembler = 0;
+  void preProcess( uint64_t& first_index, string& data, Writer& output );
+  bool process_overlapping( uint64_t& first_index, string& data );
+  uint64_t whole_length = ULONG_MAX;
 };

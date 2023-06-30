@@ -10,11 +10,11 @@ void Writer::push( string data )
 {
   // Your code here.
   (void)data;
-  totalBytesPushed += min( data.size(), capacity_ - buffer.size() );
   if ( _open == false )
     return;
   if ( buffer.size() >= capacity_ )
     return;
+  totalBytesPushed += min( data.size(), capacity_ - buffer.size() );
   buffer += data.substr( 0, min( data.size(), capacity_ - buffer.size() ) );
 }
 
